@@ -4,8 +4,8 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Product;
 class FileController extends Controller {
-    public function importExportExcelORCSV(){
-        return view('file_import_export');
+    public function form(){
+        return view('form');
     }
     public function importFileIntoDB(Request $request){
         if($request->hasFile('sample_file')){
@@ -32,5 +32,4 @@ class FileController extends Controller {
             });
         })->download($type);
     }
-}
 }
