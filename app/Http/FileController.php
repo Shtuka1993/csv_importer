@@ -3,15 +3,24 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Product;
+use Maatwebsite\Excel;
+use App\Http\Requests\TableFile;
+use App\Imports\ProductsImports;
 class FileController extends Controller {
     public function form(){
         return view('form');
     }
+    //public function importFileIntoDB(TableFile $request){
     public function importFileIntoDB(Request $request){
-        if($request->hasFile('sample_file')){
-            $path = $request->file('sample_file')->getRealPath();
-            $data = \Excel::load($path)->get();
-            if($data->count()){
+        if($request->hasFile('table_file')){
+            $path = $request->file('table_file')->getRealPath();
+            //$file = $request->file('table_file');
+            //$data = Excel::load($path)->get();
+            //Excel::import(new ProductsImport,$file);
+            $array = Excel::toArray(new ProductsImport, $path);
+            var_dump($array);
+            //7Excel::import(new ProductsImport, $path);
+            /*if($data->count()){
                 foreach ($data as $key => $value) {
                     $arr[] = ['name' => $value->name, 'details' => $value->details];
                 }
@@ -19,17 +28,8 @@ class FileController extends Controller {
                     \DB::table('products')->insert($arr);
                     dd('Insert Record successfully.');
                 }
-            }
+            }*/
         }
-        dd('Request data does not have any files to import.');
-    }
-    public function downloadExcelFile($type){
-        $products = Product::get()->toArray();
-        return \Excel::create('expertphp_demo', function($excel) use ($products) {
-            $excel->sheet('sheet name', function($sheet) use ($products)
-            {
-                $sheet->fromArray($products);
-            });
-        })->download($type);
+        //dd('Request data does not have any files to import.');
     }
 }
