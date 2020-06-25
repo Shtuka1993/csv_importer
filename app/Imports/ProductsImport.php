@@ -12,8 +12,9 @@ use Maatwebsite\Excel\Concerns\WithStartRow;
 use Maatwebsite\Excel\Concerns\WithValidation;
 use Maatwebsite\Excel\Concerns\SkipsOnFailure;
 use Maatwebsite\Excel\Validators\Failure;
+use Maatwebsite\Excel\Concerns\WithBatchInserts;
 
-class ProductsImport implements ToModel, WithStartRow, WithValidation, SkipsOnFailure
+class ProductsImport implements ToModel, WithStartRow, WithValidation, SkipsOnFailure, WithBatchInserts
 {
 
     //public $count = $this->getRowCount();
@@ -151,5 +152,9 @@ class ProductsImport implements ToModel, WithStartRow, WithValidation, SkipsOnFa
             echo '</tr>';
         }
         echo '</table>';*/
+    }
+
+    public function batchSize(): int {
+        return 100;
     }
 }
