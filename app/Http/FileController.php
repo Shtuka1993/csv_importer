@@ -20,18 +20,23 @@ class FileController extends Controller
     {
         if ($request->hasFile('table_file')) {
             $path = $request->file('table_file')->getRealPath();
-            //try {
-                Excel::import(new ProductsImport, $path);
-            /*} catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+            $productsImport = new ProductsImport;
+            try {
+                Excel::import($productsImport, $path);
+            } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
                 $failures = $e->failures();
 
+                echo '<table>';
                 foreach ($failures as $failure) {
-                    $failure->row(); // row that went wrong
-                    $failure->attribute(); // either heading key (if using heading row concern) or column index
-                    $failure->errors(); // Actual error messages from Laravel validator
-                    $failure->values(); // The values of the row that has failed.
+                    echo '<tr>';
+                    echo '<td>'.$failure->row().'</td>'; // row that went wrong
+                    echo '<td>'.$failure->attribute().'</td>'; // either heading key (if using heading row concern) or column index
+                    echo '<td>'.implode("|",$failure->errors()).'</td>'; // Actual error messages from Laravel validator
+                    echo '<td>'.implode("|",$failure->values()).'</td>'; // The values of the row that has failed.
+                    echo '</tr>';
                 }
-            }*/
+                echo '</table>';
+            }
         }
     }
 }
