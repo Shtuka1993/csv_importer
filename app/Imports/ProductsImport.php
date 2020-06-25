@@ -14,14 +14,14 @@ use Maatwebsite\Excel\Concerns\SkipsOnFailure;
 use Maatwebsite\Excel\Validators\Failure;
 use Maatwebsite\Excel\Concerns\WithBatchInserts;
 
-class ProductsImport implements ToModel, WithStartRow, WithValidation, SkipsOnFailure, WithBatchInserts
+class ProductsImport implements ToModel, WithStartRow, WithValidation, SkipsOnFailure//, WithBatchInserts
 {
 
-    //public $count = $this->getRowCount();
     public $processed = 0;
     public $failed = 0;
-    //public $dublicate = 0;
     public $added = 0;
+
+    public $errors = [];
 
     /**
      * @param array $row
@@ -37,11 +37,9 @@ class ProductsImport implements ToModel, WithStartRow, WithValidation, SkipsOnFa
         $category1 = Category::firstOrCreate(['name' => $row[0]]);
         $category2 = InnerCategory::firstOrCreate(['name' => $row[1], 'category_id'=>$category1->id]);
 
-        $subcategory = Subcategory::firstOrCreate(['name'=>$row[2], 'category_id'=>$category1->id]);
+        $subcategory = Subcategory::firstOrCreate(['name'=>$row[2], 'category_id'=>$category2->id]);
 
-
-        $product = new Product([
-        //$product = Product::firstOrCreate([
+        $product = Product::firstOrCreate([
             'manufacturer_id' => $manufacturer->id,
             'subcategory_id' => $subcategory->id,
 
@@ -52,10 +50,10 @@ class ProductsImport implements ToModel, WithStartRow, WithValidation, SkipsOnFa
             'guarantee' => (!$row[8] || $row[8] == 'Нет') ? 0 : $row[8],
             'available' => ($row[9] == 'есть в наличие') ? true : false,
         ]);
-        if(!$product->wasRecentlyCreated) {
-            //$this->dublicate++;
-        } else {
+
+        if($product->wasRecentlyCreated) {
             $this->added++;
+            return null;
         }
         return $product;
     }
@@ -142,19 +140,9 @@ class ProductsImport implements ToModel, WithStartRow, WithValidation, SkipsOnFa
     public function onFailure(Failure ...$failures)
     {
         $this->failed++;
-        /*echo '<table style="height: 150px; border: 3px solid black; overflow: auto;">';
-        foreach ($failures as $failure) {
-            echo '<tr>';
-            echo '<td>'.$failure->row().'</td>'; // row that went wrong
-            echo '<td>'.$failure->attribute().'</td>'; // either heading key (if using heading row concern) or column index
-            echo '<td>'.implode("|",$failure->errors()).'</td>'; // Actual error messages from Laravel validator
-            echo '<td>'.implode("|",$failure->values()).'</td>'; // The values of the row that has failed.
-            echo '</tr>';
-        }
-        echo '</table>';*/
     }
 
     public function batchSize(): int {
-        return 100;
+        return 1000;
     }
 }
