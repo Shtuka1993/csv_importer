@@ -12,10 +12,11 @@ use Maatwebsite\Excel\Validators\Failure;
 class ProductsImport implements ToModel, WithStartRow, WithValidation, SkipsOnFailure
 {
 
-    public $count = 0;
+    //public $count = $this->getRowCount();
     public $processed = 0;
     public $failed = 0;
     public $dublicate = 0;
+    public $added = 0;
 
     /**
      * @param array $row
@@ -24,8 +25,8 @@ class ProductsImport implements ToModel, WithStartRow, WithValidation, SkipsOnFa
      */
     public function model(array $row)
     {
-        $this->count++;
-        return Product::firstOrCreate([
+        $this->processed++;
+        $product = Product::firstOrCreate([
             'manufacturer_id' => 1,
             'subcategory_id' => 1,
 
@@ -36,6 +37,12 @@ class ProductsImport implements ToModel, WithStartRow, WithValidation, SkipsOnFa
             'guarantee' => (!$row[8] || $row[8] == 'Нет') ? 0 : $row[8],
             'available' => ($row[9] == 'есть в наличие') ? true : false,
         ]);
+        if(!$product->wasRecentlyCreated) {
+            $this->dublicate++;
+        } else {
+            $this->added++;
+        }
+        return $product;
     }
 
     public function startRow(): int
@@ -119,7 +126,8 @@ class ProductsImport implements ToModel, WithStartRow, WithValidation, SkipsOnFa
 
     public function onFailure(Failure ...$failures)
     {
-        echo '<table style="height: 150px; border: 3px solid black; overflow: auto;">';
+        $this->failed++;
+        /*echo '<table style="height: 150px; border: 3px solid black; overflow: auto;">';
         foreach ($failures as $failure) {
             echo '<tr>';
             echo '<td>'.$failure->row().'</td>'; // row that went wrong
@@ -128,6 +136,6 @@ class ProductsImport implements ToModel, WithStartRow, WithValidation, SkipsOnFa
             echo '<td>'.implode("|",$failure->values()).'</td>'; // The values of the row that has failed.
             echo '</tr>';
         }
-        echo '</table>';
+        echo '</table>';*/
     }
 }
