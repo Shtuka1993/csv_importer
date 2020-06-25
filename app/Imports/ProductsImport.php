@@ -3,6 +3,10 @@
 namespace App\Imports;
 
 use App\Product;
+use App\Category;
+use App\InnerCategory;
+use App\Subcategory;
+use App\Manufacturer;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithStartRow;
 use Maatwebsite\Excel\Concerns\WithValidation;
@@ -15,7 +19,7 @@ class ProductsImport implements ToModel, WithStartRow, WithValidation, SkipsOnFa
     //public $count = $this->getRowCount();
     public $processed = 0;
     public $failed = 0;
-    public $dublicate = 0;
+    //public $dublicate = 0;
     public $added = 0;
 
     /**
@@ -26,9 +30,19 @@ class ProductsImport implements ToModel, WithStartRow, WithValidation, SkipsOnFa
     public function model(array $row)
     {
         $this->processed++;
-        $product = Product::firstOrCreate([
-            'manufacturer_id' => 1,
-            'subcategory_id' => 1,
+
+        $manufacturer = Manufacturer::firstOrCreate(['name'=>$row[3]]);
+
+        $category1 = Category::firstOrCreate(['name' => $row[0]]);
+        $category2 = InnerCategory::firstOrCreate(['name' => $row[1], 'category_id'=>$category1->id]);
+
+        $subcategory = Subcategory::firstOrCreate(['name'=>$row[2], 'category_id'=>$category1->id]);
+
+
+        $product = new Product([
+        //$product = Product::firstOrCreate([
+            'manufacturer_id' => $manufacturer->id,
+            'subcategory_id' => $subcategory->id,
 
             'name' => $row[4]??'--- NO NAME ---',
             'article' => $row[5],
@@ -38,7 +52,7 @@ class ProductsImport implements ToModel, WithStartRow, WithValidation, SkipsOnFa
             'available' => ($row[9] == 'есть в наличие') ? true : false,
         ]);
         if(!$product->wasRecentlyCreated) {
-            $this->dublicate++;
+            //$this->dublicate++;
         } else {
             $this->added++;
         }

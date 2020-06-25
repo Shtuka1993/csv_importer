@@ -26,7 +26,7 @@ class FileController extends Controller
 
                 //echo "<h2>Total Count Of Rows - ".$productsImport->getRowCount()."</h2>";
                 echo "<h2>Count Of Processed Rows - ".$productsImport->processed."</h2>";
-                echo "<h2>Count Of Dublicated Rows - ".$productsImport->dublicate."</h2>";
+                //echo "<h2>Count Of Dublicated Rows - ".$productsImport->dublicate."</h2>";
                 echo "<h2>Count of Failed Rows - ".$productsImport->failed."</h2>";
                 echo "<h2>Count of Added Rows - ".$productsImport->added."</h2>";
 
