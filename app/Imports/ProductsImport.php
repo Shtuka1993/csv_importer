@@ -4,9 +4,9 @@ namespace App\Imports;
 
 use App\Product;
 use Maatwebsite\Excel\Concerns\ToModel;
-use Maatwebsite\Excel\Concerns\WithHeadingRow;
+use Maatwebsite\Excel\Concerns\WithStartRow;
 
-class ProductsImport implements ToModel, WithHeadingRow
+class ProductsImport implements ToModel,WithStartRow
 {
     /**
     * @param array $row
@@ -26,5 +26,9 @@ class ProductsImport implements ToModel, WithHeadingRow
             'guarantee'    => ($row[8] || $row[8]=='Нет') ? 0 : $row[8],
             'available'    => ($row[9]=='есть в наличие') ? true : false,
         ]);
+    }
+
+    public function startRow(): int {
+        return 2;
     }
 }
