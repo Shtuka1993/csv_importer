@@ -14,7 +14,7 @@ class ProductsImport implements ToModel
     */
     public function model(array $row)
     {
-        return new Product([
+        return Product::firstOrCreate([
             'name'     => $row[4],
             'article'    => $row[5],
             'description'    => $row[6],
