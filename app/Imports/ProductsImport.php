@@ -4,8 +4,9 @@ namespace App\Imports;
 
 use App\Product;
 use Maatwebsite\Excel\Concerns\ToModel;
+use Maatwebsite\Excel\Concerns\WithHeadingRow;
 
-class ProductsImport implements ToModel
+class ProductsImport implements ToModel, WithHeadingRow
 {
     /**
     * @param array $row
@@ -15,6 +16,9 @@ class ProductsImport implements ToModel
     public function model(array $row)
     {
         return Product::firstOrCreate([
+            'manufacturer_id' => 1,
+            'subcategory_id' => 1,
+
             'name'     => $row[4],
             'article'    => $row[5],
             'description'    => $row[6],
